@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm install --workspaces --include-workspace-root"]
+
+[phases.build]
+cmds = [
+  "npm run build:client",
+  "npm run build:server",
+  "npm run db:generate"
+]
+
+[start]
+cmd = "npm run db:migrate && npm start"
