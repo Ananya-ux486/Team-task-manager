@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import { execSync } from 'child_process';
 
 import authRoutes from './routes/auth.routes';
 import projectRoutes from './routes/project.routes';
@@ -11,6 +12,21 @@ import taskRoutes from './routes/task.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import userRoutes from './routes/user.routes';
 import { errorHandler } from './middleware/errorHandler';
+
+// Run DB migrations automatically on startup in production
+if (process.env.NODE_ENV === 'production') {
+  try {
+    console.log('🔄 Running database migrations...');
+    execSync('npx prisma migrate deploy', {
+      cwd: path.join(__dirname, '..'),
+      stdio: 'inherit',
+    });
+    console.log('✅ Database migrations complete');
+  } catch (err) {
+    console.error('❌ Migration failed:', err);
+    // Don't exit — app may still work if DB is already up to date
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
