@@ -9,3 +9,4 @@ cmds = ["cd server && npx prisma generate"]
 
 [start]
 cmd = "node server/dist/index.js"
+# v2
