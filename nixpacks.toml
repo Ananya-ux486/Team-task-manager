@@ -2,14 +2,10 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["npm ci --workspaces --include-workspace-root"]
+cmds = ["npm install --prefix server --legacy-peer-deps"]
 
 [phases.build]
-cmds = [
-  "cd server && npx prisma generate",
-  "npm run build:client",
-  "npm run build:server"
-]
+cmds = ["cd server && npx prisma generate"]
 
 [start]
 cmd = "node server/dist/index.js"
