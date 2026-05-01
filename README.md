@@ -4,7 +4,7 @@ A full-stack web app built for managing team projects and tasks. Users can creat
 
 ## Live URL
 
-https://team-task-manager-production-6b04.up.railway.app
+https://team-task-manager-production-30d0.up.railway.app
 
 ## GitHub Repo
 
