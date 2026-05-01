@@ -1,217 +1,127 @@
-# TaskFlow — Team Task Manager
+# Team Task Manager
 
-A full-stack web application for managing team projects and tasks with role-based access control.
+A full-stack web app built for managing team projects and tasks. Users can create projects, assign tasks to team members, and track progress. It has role-based access so admins can manage everything while members can update their own tasks.
 
-## 🚀 Live Demo
+## Live URL
 
-> Add your Railway URL here after deployment.
+https://team-task-manager-production-6b04.up.railway.app
 
-## ✨ Features
+## GitHub Repo
 
-- **Authentication** — Signup/Login with JWT + refresh tokens, Forgot/Reset password
-- **Role-Based Access** — Admin and Member roles with project-level permissions
-- **Project Management** — Create, update, delete projects with team membership
-- **Task Management** — Full CRUD with assignment, status tracking (TODO / IN_PROGRESS / COMPLETED / BLOCKED), due dates
-- **Kanban Board** — Visual task management with column-based status view
-- **List View** — Table view with sorting and filtering
-- **Dashboard** — Real-time stats: tasks by status, overdue count, completion rate
-- **Team Management** — Add/remove members per project with role assignment
+https://github.com/Ananya-ux486/team-task-manager
 
-## 🛠 Tech Stack
+## What it does
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + TypeScript + Vite |
-| Styling | Tailwind CSS + shadcn/ui |
-| State | Zustand (auth) + TanStack Query (server state) |
-| Backend | Node.js + Express + TypeScript |
-| Database | PostgreSQL + Prisma ORM |
-| Auth | JWT (15min) + Refresh Tokens (7 days) |
-| Deployment | Railway |
+- Sign up and log in with JWT authentication
+- Create projects and invite team members
+- Create tasks, assign them to people, set due dates
+- Track task status: Todo, In Progress, Completed, Blocked
+- Kanban board view and list view for tasks
+- Dashboard showing task stats, overdue tasks, completion rate
+- Admin and Member roles — admins manage everything, members update their own tasks
+- Forgot password / reset password flow
 
----
+## Tech Stack
 
-## 🚂 Deploy to Railway (Step-by-Step)
+**Frontend**
+- React 18 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- shadcn/ui for components
+- TanStack Query for data fetching
+- Zustand for auth state
 
-### Prerequisites
-- GitHub account
-- Railway account (free at [railway.app](https://railway.app))
+**Backend**
+- Node.js with Express
+- TypeScript
+- PostgreSQL database
+- Prisma ORM
+- JWT for authentication
 
-### Step 1 — Push to GitHub
+**Deployment**
+- Railway (backend + database)
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/team-task-manager.git
-git push -u origin main
-```
+## Running locally
 
-### Step 2 — Create Railway Project
-
-1. Go to [railway.app](https://railway.app) → **New Project**
-2. Select **"Deploy from GitHub repo"**
-3. Connect your GitHub account and select your repository
-4. Railway will detect the `nixpacks.toml` and start building
-
-### Step 3 — Add PostgreSQL Database
-
-1. In your Railway project, click **"+ New"** → **"Database"** → **"Add PostgreSQL"**
-2. Railway automatically creates a PostgreSQL instance and injects `DATABASE_URL` into your service
-
-### Step 4 — Set Environment Variables
-
-In your Railway service → **Variables** tab, add:
-
-| Variable | Value |
-|---|---|
-| `NODE_ENV` | `production` |
-| `JWT_SECRET` | A random 64-character string (generate at [randomkeygen.com](https://randomkeygen.com)) |
-| `DATABASE_URL` | Auto-injected by Railway PostgreSQL addon |
-
-> **Note:** `PORT` is automatically set by Railway. `CLIENT_URL` is not needed since the server serves the frontend from the same origin.
-
-### Step 5 — Deploy
-
-Railway auto-deploys on every push to `main`. The build process:
-1. Installs all dependencies
-2. Builds the React frontend (`client/dist/`)
-3. Compiles TypeScript server (`server/dist/`)
-4. Generates Prisma client
-5. On startup: runs `prisma migrate deploy` then starts the server
-
-### Step 6 — Get Your Live URL
-
-1. In Railway → your service → **Settings** → **Networking** → **Generate Domain**
-2. Your app is live at `https://your-app.railway.app`
-
-### Step 7 — Seed Initial Data (Optional)
-
-After deployment, open Railway's shell for your service and run:
-```bash
-npm run db:seed --workspace=server
-```
-
-This creates:
-- Admin: `admin@taskflow.com` / `admin123456`
-- Member: `member@taskflow.com` / `member123456`
-- 2 sample projects with tasks
-
----
-
-## 💻 Local Development
-
-### Prerequisites
-- Node.js 20+
-- PostgreSQL database (or use [Neon](https://neon.tech) free tier)
-
-### Setup
+You need Node.js 20+ and a PostgreSQL database.
 
 ```bash
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/team-task-manager.git
+git clone https://github.com/Ananya-ux486/team-task-manager.git
 cd team-task-manager
-
-# Install all dependencies
 npm install
+```
 
-# Configure environment
-cp server/.env.example server/.env
-# Edit server/.env with your DATABASE_URL and JWT_SECRET
+Create a `.env` file inside the `server` folder:
 
-# Run database migrations
+```
+DATABASE_URL=your_postgresql_connection_string
+JWT_SECRET=your_secret_key_here
+PORT=3001
+NODE_ENV=development
+```
+
+Run migrations and start:
+
+```bash
 npm run db:migrate --workspace=server
-
-# (Optional) Seed sample data
-npm run db:seed --workspace=server
-
-# Start development servers
 npm run dev
 ```
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3001
+Frontend runs on http://localhost:5173 and backend on http://localhost:3001
 
----
+## API Endpoints
 
-## 📡 API Endpoints
+**Auth**
+- POST /api/auth/signup
+- POST /api/auth/login
+- POST /api/auth/logout
+- POST /api/auth/forgot-password
+- POST /api/auth/reset-password
 
-### Authentication
-| Method | Path | Description |
-|---|---|---|
-| POST | `/api/auth/signup` | Register new user |
-| POST | `/api/auth/login` | Login |
-| POST | `/api/auth/refresh` | Refresh access token |
-| POST | `/api/auth/logout` | Logout |
-| POST | `/api/auth/forgot-password` | Request password reset |
-| POST | `/api/auth/reset-password` | Reset password with token |
+**Projects**
+- GET /api/projects
+- POST /api/projects
+- GET /api/projects/:id
+- PUT /api/projects/:id
+- DELETE /api/projects/:id
 
-### Projects
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/api/projects` | Any | List user's projects |
-| POST | `/api/projects` | Any | Create project (creator becomes Admin) |
-| GET | `/api/projects/:id` | Member | Get project details |
-| PUT | `/api/projects/:id` | Project Admin | Update project |
-| DELETE | `/api/projects/:id` | Project Admin | Delete project |
+**Tasks**
+- GET /api/projects/:id/tasks
+- POST /api/tasks
+- PUT /api/tasks/:id
+- DELETE /api/tasks/:id
 
-### Team
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/api/projects/:id/members` | Member | List members |
-| POST | `/api/projects/:id/members` | Project Admin | Add member |
-| DELETE | `/api/projects/:id/members/:userId` | Project Admin | Remove member |
+**Team**
+- GET /api/projects/:id/members
+- POST /api/projects/:id/members
+- DELETE /api/projects/:id/members/:userId
 
-### Tasks
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/api/projects/:id/tasks` | Member | List tasks (filterable by status/assignee/overdue) |
-| POST | `/api/tasks` | Project Admin | Create task |
-| PUT | `/api/tasks/:id` | Member/Admin | Update task |
-| DELETE | `/api/tasks/:id` | Project Admin | Delete task |
+**Dashboard**
+- GET /api/dashboard
 
-### Dashboard
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/api/dashboard` | Any | Get task statistics |
-| GET | `/api/health` | None | Health check |
+## Environment Variables
 
----
+| Variable | Description |
+|---|---|
+| DATABASE_URL | PostgreSQL connection string |
+| JWT_SECRET | Secret key for signing tokens |
+| NODE_ENV | development or production |
+| PORT | Port number (Railway sets this automatically) |
 
-## 🔐 Environment Variables
+## Database
 
-| Variable | Description | Required |
-|---|---|---|
-| `DATABASE_URL` | PostgreSQL connection string | ✅ Yes |
-| `JWT_SECRET` | JWT signing secret (min 32 chars) | ✅ Yes |
-| `NODE_ENV` | `development` or `production` | No (defaults to development) |
-| `PORT` | Server port | No (Railway sets this automatically) |
-| `CLIENT_URL` | Allowed CORS origin | No (not needed in production same-origin) |
+Uses PostgreSQL with Prisma. Tables: users, projects, tasks, project_members, refresh_tokens, password_reset_tokens.
 
----
-
-## 📁 Project Structure
-
+Run migrations with:
+```bash
+npm run db:migrate --workspace=server
 ```
-team-task-manager/
-├── client/                 # React frontend (Vite + TypeScript)
-│   └── src/
-│       ├── components/     # UI components (shadcn/ui + custom)
-│       ├── pages/          # Route pages
-│       ├── hooks/          # TanStack Query hooks
-│       ├── store/          # Zustand auth store
-│       └── lib/            # API client, utilities
-├── server/                 # Express backend (TypeScript)
-│   ├── src/
-│   │   ├── routes/         # Express routes
-│   │   ├── controllers/    # Request handlers
-│   │   ├── services/       # Business logic
-│   │   ├── middleware/     # Auth, validation, error handling
-│   │   └── schemas/        # Zod validation schemas
-│   └── prisma/
-│       └── schema.prisma   # Database schema
-├── nixpacks.toml           # Railway build config
-├── railway.toml            # Railway deploy config
-└── README.md
+
+Seed sample data:
+```bash
+npm run db:seed --workspace=server
 ```
+
+This creates two test accounts:
+- admin@taskflow.com / admin123456
+- member@taskflow.com / member123456
