@@ -6,9 +6,9 @@ cmds = ["npm install --workspaces --include-workspace-root --legacy-peer-deps"]
 
 [phases.build]
 cmds = [
+  "cd server && npx prisma generate",
   "npm run build:client",
-  "npm run build:server",
-  "cd server && npx prisma generate"
+  "npm run build:server"
 ]
 
 [start]

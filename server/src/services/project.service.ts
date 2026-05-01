@@ -1,6 +1,15 @@
 import prisma from '../prisma/client';
 import { AppError } from '../middleware/errorHandler';
-import { UserRole } from '@prisma/client';
+import { TaskStatus, UserRole } from '@prisma/client';
+
+type TaskStats = Record<TaskStatus, number>;
+
+const emptyTaskStats = (): TaskStats => ({
+  TODO: 0,
+  IN_PROGRESS: 0,
+  COMPLETED: 0,
+  BLOCKED: 0,
+});
 
 export const getProjects = async (userId: string) => {
   const memberships = await prisma.projectMember.findMany({
@@ -16,8 +25,8 @@ export const getProjects = async (userId: string) => {
   });
 
   return memberships.map((m) => {
-    const taskStats = { TODO: 0, IN_PROGRESS: 0, COMPLETED: 0, BLOCKED: 0 };
-    m.project.tasks.forEach((t) => {
+    const taskStats = emptyTaskStats();
+    m.project.tasks.forEach((t: { status: TaskStatus }) => {
       taskStats[t.status]++;
     });
     return {
@@ -70,8 +79,10 @@ export const getProjectById = async (projectId: string, userId: string) => {
   const membership = project.members.find((m) => m.userId === userId);
   if (!membership) throw new AppError(403, 'Access denied');
 
-  const taskStats = { TODO: 0, IN_PROGRESS: 0, COMPLETED: 0, BLOCKED: 0 };
-  project.tasks.forEach((t) => { taskStats[t.status]++; });
+  const taskStats = emptyTaskStats();
+  project.tasks.forEach((t: { status: TaskStatus }) => {
+    taskStats[t.status]++;
+  });
 
   return {
     id: project.id,
@@ -145,7 +156,6 @@ export const removeMember = async (projectId: string, userId: string) => {
   });
   if (!membership) throw new AppError(404, 'Member not found');
 
-  // Unassign all tasks assigned to this user in the project
   await prisma.task.updateMany({
     where: { projectId, assigneeId: userId },
     data: { assigneeId: null },

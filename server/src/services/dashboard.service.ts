@@ -1,7 +1,9 @@
 import prisma from '../prisma/client';
+import { TaskStatus } from '@prisma/client';
+
+type TaskStats = Record<TaskStatus, number>;
 
 export const getDashboardStats = async (userId: string, projectId?: string) => {
-  // Get all projects the user is a member of
   const memberships = await prisma.projectMember.findMany({
     where: { userId },
     select: { projectId: true },
@@ -9,7 +11,7 @@ export const getDashboardStats = async (userId: string, projectId?: string) => {
 
   const projectIds = projectId
     ? [projectId]
-    : memberships.map((m) => m.projectId);
+    : memberships.map((m: { projectId: string }) => m.projectId);
 
   const now = new Date();
 
@@ -34,14 +36,19 @@ export const getDashboardStats = async (userId: string, projectId?: string) => {
     }),
   ]);
 
-  const tasksByStatus = { TODO: 0, IN_PROGRESS: 0, COMPLETED: 0, BLOCKED: 0 };
-  tasks.forEach((t) => {
+  const tasksByStatus: TaskStats = {
+    TODO: 0,
+    IN_PROGRESS: 0,
+    COMPLETED: 0,
+    BLOCKED: 0,
+  };
+
+  tasks.forEach((t: { status: TaskStatus; _count: { status: number } }) => {
     tasksByStatus[t.status] += t._count.status;
   });
 
   const totalTasks = Object.values(tasksByStatus).reduce((a, b) => a + b, 0);
 
-  // Get project summaries
   const projects = await prisma.project.findMany({
     where: { id: { in: projectIds } },
     select: {
@@ -56,7 +63,7 @@ export const getDashboardStats = async (userId: string, projectId?: string) => {
     overdueCount,
     assignedToMe,
     totalTasks,
-    projects: projects.map((p) => ({
+    projects: projects.map((p: { id: string; name: string; _count: { tasks: number } }) => ({
       id: p.id,
       name: p.name,
       taskCount: p._count.tasks,
